@@ -1,5 +1,3 @@
-# Stock-Out Prediction System
-
 Predict inventory stock-outs (shortages) at item × store level using ML pipeline.
 
 This repository includes:
@@ -111,15 +109,3 @@ Production considerations
 - Scheduling: use Airflow/Prefect for orchestration.
 - Monitoring: log predictions, track drift (feature distributions), and business metrics.
 - Retraining policy: automated retraining on new data, with validation & gating.
-
-Security & privacy
-- Do not commit sensitive production data.
-- Use synthetic or redacted data for public repos and portfolio.
-
-License
-- MIT
-
-If you'd like, I can:
-- Convert the notebooks into polished visuals for your portfolio article.
-- Wire the pipeline to a real dataset (tell me which one).
-- Add Terraform/Helm manifests for cloud deployment.
