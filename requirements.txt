@@ -1,0 +1,14 @@
+pandas>=1.5
+numpy>=1.21
+scikit-learn>=1.1
+lightgbm>=3.3
+joblib>=1.2
+fastapi>=0.85
+uvicorn>=0.18
+pydantic>=1.10
+pytest>=7.1
+pyyaml>=6.0
+shap>=0.41
+matplotlib>=3.5
+seaborn>=0.12
+black==24.3.0
