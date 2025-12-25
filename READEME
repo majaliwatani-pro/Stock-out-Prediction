@@ -1,0 +1,181 @@
+Stock-Out Prediction (Item × Store)
+
+Predict inventory stock-outs (shortages) at the **item × store** level using a complete **machine learning pipeline**, from data generation and feature engineering to model training, API inference, containerization, and CI.
+
+This project is designed for **realistic experimentation**, **local development**, and **production-oriented deployment**.
+
+What’s Included
+
+* **Synthetic dataset generator** for reproducible local testing
+* **End-to-end ML pipeline** (data prep → feature engineering → training → evaluation)
+* **FastAPI inference service** for real-time predictions
+* **Docker & docker-compose** for containerized local/dev runs
+* **GitHub Actions CI** for automated testing
+* **Example hooks** for batch scheduling and monitoring
+* **Portfolio article** explaining design decisions and trade-offs
+
+ Quick Links
+
+* **Run locally (PyCharm / CLI)** → *Run locally*
+* **Docker setup** → *Docker*
+* **Public datasets (Kaggle)** → *Using public datasets*
+* **Project article** → `PORTFOLIO_ARTICLE.md`
+
+📁 Project Layout
+
+.
+├── data/
+│   ├── synthetic_generator.py    # Generate synthetic datasets
+│   └── sample_data.csv           # Small committed example
+├── notebooks/                    # Optional EDA & analysis
+├── src/
+│   ├── data_prep.py              # Ingestion & label creation
+│   ├── feature_engineering.py    # Modeling features
+│   ├── model.py                  # Train / evaluate / save / load
+│   ├── train.py                  # Training entrypoint
+│   ├── predict_api.py            # FastAPI inference app
+│   └── config.py                 # Central configuration
+├── models/                       # Trained model artifacts
+├── tests/                        # Unit tests
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── Makefile
+├── .github/workflows/ci.yml
+├── README.md
+└── PORTFOLIO_ARTICLE.md
+
+Requirements
+
+* Python **3.9+**
+* Linux / macOS / Windows (PyCharm supported)
+* Optional: **Docker** & **docker-compose**
+
+Installation (Recommended: virtual environment)
+
+bash
+pip install -r requirements.txt
+
+
+▶️ Run Locally (Minimal)
+
+1️⃣ Generate a synthetic dataset
+
+bash
+python data/synthetic_generator.py \
+  --out data/sample_data.csv \
+  --start 2023-01-01 \
+  --days 365 \
+  --n_stores 10 \
+  --n_items 50
+
+
+2️⃣ Train the model
+
+bash
+python src/train.py \
+  --data-path data/sample_data.csv \
+  --model-out models/stockout_model.pkl \
+  --horizon 7
+
+
+3️⃣ Run the API (after training)
+
+bash
+uvicorn src.predict_api:app --reload --host 0.0.0.0 --port 8000
+
+
+API docs:
+👉 `http://127.0.0.1:8000/docs`
+
+**Example request**
+
+json
+POST /predict
+{
+  "store_id": 1,
+  "item_id": 10,
+  "date": "2024-01-05",
+  "sales_lag_1": 5,
+  "sales_rmean_7": 6.2,
+  "days_of_cover": 2.5,
+  "on_promotion": 0
+}
+
+ Synthetic Dataset (What It Does)
+
+* Simulates **daily sales** for N stores × M items
+* Generates **random replenishments (shipments)**
+* Computes **stock_on_hand** via inventory flow
+* Adds promotions, pricing, and holiday effects
+* Outputs a CSV with columns:
+
+date, store_id, item_id, sales, stock_on_hand,
+shipments_received, price, on_promotion, is_holiday
+
+
+🌍 Using Public Datasets (Kaggle)
+
+Supported datasets include:
+
+* **Rossmann**
+* **Favorita**
+* **M5**
+
+Notes:
+
+* Kaggle requires API credentials for downloads
+* See `scripts/download_kaggle.sh`
+* If `stock_on_hand` is missing, the repo includes
+  inventory simulation logic in `src/data_prep.py`
+
+🐳 Docker
+
+### Build image
+
+bash
+docker build -t stockout-app:latest .
+
+
+### Run with docker-compose
+
+```bash
+docker-compose up --build
+```
+
+API available at:
+👉 `http://localhost:8000`
+
+
+✅ CI & Tests
+
+* GitHub Actions runs tests on every push
+* Local test run:
+
+```bash
+pytest -q
+```
+
+---
+
+🏭 Production Considerations
+
+* **Data access**: Use secure DB connections, not CSVs
+* **Secrets**: Store credentials in vaults or secret managers
+* **Model registry**: MLflow / S3 / artifact stores
+* **Scheduling**: Airflow or Prefect
+* **Monitoring**:
+
+  * Prediction logging
+  * Feature drift detection
+  * Business KPIs
+* **Retraining**:
+
+  * Automated pipelines
+  * Validation & promotion gates
+
+---
+
+📜 License
+
+MIT License — free to use, modify, and adapt.
